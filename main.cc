@@ -1,6 +1,8 @@
 #include <iostream>
-#include <maxminddb.h>
 #include <filesystem>
+#include <cstring>
+
+#include <maxminddb.h>
 
 int main() {
 	MMDB_s mmdb;
