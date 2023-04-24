@@ -16,4 +16,5 @@ just for personal practice
   - source data: https://github.com/maxmind/MaxMind-DB/tree/main/source-data
 
 ### TODO
-- Cmake caching on github actions
+- [ ] Cmake caching on github actions
+- [ ] Cmake -> ninja (or bazel)
