@@ -1,13 +1,10 @@
 #include <iostream>
-#include <filesystem>
 #include <cstring>
 
 #include <maxminddb.h>
 
 int main() {
 	MMDB_s mmdb;
-	std::filesystem::path cwd = std::filesystem::current_path();
-	std::cout << cwd << std::endl;
 
 	std::string _ip{"0000:0000:0000:0000:0000:0000:3B00:0001"};
 	std::string _filename{"../files/GeoIP2-ISP-Test.mmdb"};  // note cwd
