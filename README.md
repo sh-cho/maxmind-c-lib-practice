@@ -14,3 +14,6 @@ just for personal practice
 - MaxMind-DB (maxmind test db): https://github.com/maxmind/MaxMind-DB
   - test data: https://github.com/maxmind/MaxMind-DB/tree/main/test-data
   - source data: https://github.com/maxmind/MaxMind-DB/tree/main/source-data
+
+### TODO
+- Cmake caching on github actions
