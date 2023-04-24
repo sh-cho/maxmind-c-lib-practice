@@ -1,5 +1,7 @@
 ## maxmind-c-lib-practice
 
+[![CI](https://github.com/sh-cho/maxmind-c-lib-practice/actions/workflows/CI.yaml/badge.svg?branch=main&event=push)](https://github.com/sh-cho/maxmind-c-lib-practice/actions/workflows/CI.yaml)
+
 just for personal practice
 
 ### env
