@@ -14,12 +14,12 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - uses: HorseBaerbel/action-clang-tidy
-      with:
-        scandir: '.'
-        builddir: 'build'
-        extensions: 'c,h,C,H,cpp,hpp,cc,hh,c++,h++,cxx,hxx'
+      - uses: actions/checkout@v3
+      - uses: HorseBaerbel/action-clang-tidy@1.2
+        with:
+          scandir: '.'
+          builddir: 'build'
+          extensions: 'c,h,C,H,cpp,hpp,cc,hh,c++,h++,cxx,hxx'
 
   build-and-test:
     # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
