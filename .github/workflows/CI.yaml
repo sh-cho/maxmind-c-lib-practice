@@ -15,11 +15,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: HorstBaerbel/action-clang-tidy@1.2
-        with:
-          scandir: '.'
-          builddir: 'build'
-          extensions: 'c,h,C,H,cpp,hpp,cc,hh,c++,h++,cxx,hxx'
+      - name: Install clang-tidy
+        run: apt-get update && apt-get install -y clang-tidy
+      - name: Run clang-tidy
+        run: find . -name "*.cc" -o -name "*.h" | xargs -P 4 clang-tidy -p build/
 
   build-and-test:
     # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
