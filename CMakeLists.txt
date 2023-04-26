@@ -1,7 +1,9 @@
 cmake_minimum_required(VERSION 3.24)
 project(maxmind_c_lib_practice)
 
-set(CMAKE_CXX_STANDARD 17)
+if (NOT CMAKE_CXX_STANDARD)
+    set(CMAKE_CXX_STANDARD 17)
+endif ()
 
 ## External Libraries
 include(FetchContent)
@@ -36,6 +38,6 @@ add_executable(
 target_link_libraries(main_test
         GTest::gtest_main
         maxminddb
-)
+        )
 include(GoogleTest)
 gtest_discover_tests(main_test)
