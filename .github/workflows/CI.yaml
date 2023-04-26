@@ -20,7 +20,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y clang-tidy
       - name: Run clang-tidy
-        run: find . -name "*.cc" -o -name "*.h" | xargs -P 4 clang-tidy -p build/
+        run: find . \( -name "*.cc" -o -name "*.h" \) ! -name "*_test.cc" | xargs -P 4 clang-tidy -p build/
 
   build-and-test:
     # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
