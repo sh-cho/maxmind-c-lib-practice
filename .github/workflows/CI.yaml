@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: HorseBaerbel/action-clang-tidy@1.2
+      - uses: HorstBaerbel/action-clang-tidy@1.2
         with:
           scandir: '.'
           builddir: 'build'
