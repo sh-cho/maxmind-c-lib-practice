@@ -1,5 +1,8 @@
 #include "geo_ip_loader.h"
 
+#include <sstream>
+#include <unordered_map>
+
 const std::unordered_map<int, std::string> ISO_MAP = {
 		{202, "GR"},
 		{204, "NL"},
@@ -246,14 +249,129 @@ std::string EmptyGeoIPLoader::getMccmnc(std::string ip) {
 	return GeoIPLoader::DEFAULT_MCCMNC;
 }
 
-std::string EmptyGeoIPLoader::getMccmnc(sockaddr &addr) {
+std::string EmptyGeoIPLoader::getMccmnc(sockaddr_in &addr) {
 	return GeoIPLoader::DEFAULT_MCCMNC;
 }
 
-std::string MaxmindGeoIPLoader::getMccmnc(std::string ip) {
-	return std::string();
+MaxmindGeoIPLoader::MaxmindGeoIPLoader(std::string isp_db_filename, std::string country_db_filename) {
+	{
+		if (isp_db_filename.empty()) {
+			return;
+		}
+		int status = MMDB_open(isp_db_filename.data(), MMDB_MODE_MMAP, &isp_db);
+		if (MMDB_SUCCESS != status) {
+			std::cerr << "(ISP) Can't open " << isp_db_filename << " - " << MMDB_strerror(status) << std::endl;
+		}
+	}
+
+	{
+		if (country_db_filename.empty()) {
+			return;
+		}
+		int status = MMDB_open(country_db_filename.data(), MMDB_MODE_MMAP, &country_db);
+		if (MMDB_SUCCESS != status) {
+			std::cerr << "(COUNTRY) Can't open " << country_db_filename << " - " << MMDB_strerror(status) << std::endl;
+		}
+	}
 }
 
-std::string MaxmindGeoIPLoader::getMccmnc(sockaddr &addr) {
+MaxmindGeoIPLoader::~MaxmindGeoIPLoader() {
+	std::clog << "[~MaxmindGeoIPLoader]" << std::endl;
+
+	MMDB_close(&isp_db);
+	MMDB_close(&country_db);
+}
+
+std::string MaxmindGeoIPLoader::getMccmnc(std::string ip) {
+	std::clog << "[::getMccmnc] ip: " << ip << std::endl;
+
+	{
+		int gai_error, mmdb_error;
+		MMDB_lookup_result_s result = MMDB_lookup_string(&isp_db, ip.data(), &gai_error, &mmdb_error);
+		if (0 != gai_error) {
+			std::cerr << "getaddressinfo error: " << gai_strerror(gai_error) << std::endl;
+			return GeoIPLoader::DEFAULT_MCCMNC;
+		}
+		if (MMDB_SUCCESS != mmdb_error) {
+			std::cerr << "libmaxminddb error: " << MMDB_strerror(mmdb_error) << std::endl;
+			return GeoIPLoader::DEFAULT_MCCMNC;
+		}
+
+		if (!result.found_entry) {
+			std::clog << "[::getMccmnc] entry not found" << std::endl;
+			return GeoIPLoader::DEFAULT_MCCMNC;
+		}
+
+		std::clog << "[::getMccmnc] found entry" << std::endl;
+		MMDB_entry_data_list_s *entry_data_list = NULL;
+		int status = MMDB_get_entry_data_list(&result.entry, &entry_data_list);
+		if (MMDB_SUCCESS != status) {
+			std::clog << "[::getMccmnc] got an error while get_entry_data_list: " << MMDB_strerror(status) << std::endl;
+			goto cleanup_;
+		}
+
+		if (nullptr == entry_data_list) {
+			std::clog << "[::getMccmnc] entry not found" << std::endl;
+			goto cleanup_;
+		}
+
+		{
+			std::clog << "[::getMccmnc] dump" << std::endl;
+			MMDB_dump_entry_data_list(stdout, entry_data_list, 2);
+
+			MMDB_entry_data_s entry_data;
+
+			/// mobile_country_code + mobile_network_code
+			/// NOTE: entry_data -> out parameter
+//			std::string mcc, mnc;
+			int status2 = MMDB_get_value(&result.entry, &entry_data, "mobile_country_code", nullptr);
+			if (MMDB_SUCCESS != status2) {
+				std::clog << "[::getMccmnc][mcc] mmdb error: " << MMDB_strerror(status2)
+						  << std::endl;
+				goto cleanup_;
+			} else if (!entry_data.has_data) {
+				std::clog << "[::getMccmnc][mcc] !entry_data.has_data" << std::endl;
+				goto cleanup_;
+			}
+
+			std::ostringstream oss;
+			oss << std::string_view{entry_data.utf8_string, entry_data.data_size};
+
+			int status3 = MMDB_get_value(&result.entry, &entry_data, "mobile_network_code", nullptr);
+			if (MMDB_SUCCESS != status3) {
+				std::clog << "[::getMccmnc][mnc] mmdb error: " << MMDB_strerror(status3)
+						  << std::endl;
+				goto cleanup_;
+			} else if (!entry_data.has_data) {
+				std::clog << "[::getMccmnc][mnc] !entry_data.has_data" << std::endl;
+				goto cleanup_;
+			}
+
+			oss << std::string_view{entry_data.utf8_string, entry_data.data_size};
+
+			const auto & mccmnc = oss.str();
+			if (mccmnc.empty()) {
+				std::clog << "[::getMccmnc] empty mccmnc" << std::endl;
+				goto cleanup_;
+			}
+
+			std::clog << "[::getMccmnc] GOOD! - " << mccmnc << std::endl;
+
+			MMDB_free_entry_data_list(entry_data_list);
+			return mccmnc;
+		}
+
+		cleanup_:
+		MMDB_free_entry_data_list(entry_data_list);
+	}
+
+	std::clog << "[::getMccmnc] returning default mccmnc" << std::endl;
+	return GeoIPLoader::DEFAULT_MCCMNC;
+
+	/// country_db
+
+}
+
+std::string MaxmindGeoIPLoader::getMccmnc(sockaddr_in &addr) {
 	return std::string();
 }

@@ -23,7 +23,7 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
-add_executable(maxmind_c_lib_practice main.cc geo_ip_loader.cc geo_ip_loader.h)
+add_executable(maxmind_c_lib_practice main.cc geo_ip_loader.cc)
 target_link_libraries(maxmind_c_lib_practice maxminddb)
 
 ## gtest
@@ -31,10 +31,11 @@ enable_testing()
 add_executable(
         main_test
         main_test.cc
+        geo_ip_loader.cc
 )
-target_link_libraries(
-        main_test
+target_link_libraries(main_test
         GTest::gtest_main
+        maxminddb
 )
 include(GoogleTest)
 gtest_discover_tests(main_test)

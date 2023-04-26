@@ -218,3 +218,6 @@ Temporary Items
 .ninja_log
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,c++,cmake,bazel,ninja,clion
+
+### exclude real data
+/files/GeoIP2-ISP-real.mmdb

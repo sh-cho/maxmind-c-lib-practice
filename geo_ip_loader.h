@@ -3,7 +3,10 @@
 
 #include <string>
 #include <sys/socket.h>
-#include <unordered_map>
+#include <iostream>
+#include <fstream>
+
+#include <maxminddb.h>
 
 class GeoIPLoader {
 public:
@@ -16,21 +19,29 @@ public:
 
 	virtual std::string getMccmnc(std::string ip) = 0;
 
-	virtual std::string getMccmnc(sockaddr &addr) = 0;
+	virtual std::string getMccmnc(sockaddr_in &addr) = 0;
 };
 
 class EmptyGeoIPLoader : public GeoIPLoader {
 public:
 	std::string getMccmnc(std::string ip) override;
 
-	std::string getMccmnc(sockaddr &addr) override;
+	std::string getMccmnc(sockaddr_in &addr) override;
 };
 
 class MaxmindGeoIPLoader : public GeoIPLoader {
+private:
+	MMDB_s isp_db;
+	MMDB_s country_db;
+
 public:
+	MaxmindGeoIPLoader(std::string isp_db_filename, std::string country_db_filename);
+
+	~MaxmindGeoIPLoader() override;
+
 	std::string getMccmnc(std::string ip) override;
 
-	std::string getMccmnc(sockaddr &addr) override;
+	std::string getMccmnc(sockaddr_in &addr) override;
 };
 
 #endif //MAXMIND_LIB_TEST_GEO_IP_LOADER_H
