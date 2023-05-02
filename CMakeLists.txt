@@ -15,6 +15,13 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(maxminddb)
 
+FetchContent_Declare(
+        spdlog
+        GIT_REPOSITORY "https://github.com/gabime/spdlog"
+        GIT_TAG "v1.11.0"
+)
+FetchContent_MakeAvailable(spdlog)
+
 # Ref: https://google.github.io/googletest/quickstart-cmake.html
 FetchContent_Declare(
         googletest
@@ -25,8 +32,9 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
-add_executable(maxmind_c_lib_practice main.cc geo_ip_loader.cc)
-target_link_libraries(maxmind_c_lib_practice maxminddb)
+
+add_executable(maxmind_c_lib_practice main.cc geo_ip_loader.cc maxmind_db_reader.cc maxmind_error_category.cc)
+target_link_libraries(maxmind_c_lib_practice PRIVATE maxminddb spdlog::spdlog)
 
 ## gtest
 enable_testing()
@@ -34,10 +42,11 @@ add_executable(
         main_test
         main_test.cc
         geo_ip_loader.cc
-)
+        maxmind_db_reader.cc maxmind_error_category.cc)
 target_link_libraries(main_test
         GTest::gtest_main
         maxminddb
+        spdlog::spdlog
         )
 include(GoogleTest)
 gtest_discover_tests(main_test)

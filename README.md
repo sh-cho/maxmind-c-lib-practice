@@ -17,4 +17,5 @@ just for personal practice
 
 ### TODO
 - [ ] Cmake caching on github actions
-- [ ] Cmake -> ninja (or bazel)
+- [ ] Cmake -> bazel
+- [ ] abseil
