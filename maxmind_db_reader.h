@@ -35,7 +35,7 @@ public:
 /// Exceptions
 class NotFoundException final: public std::logic_error {
 public:
-	NotFoundException(): std::logic_error("NOT FOUND") {};
+	NotFoundException(std::string const& msg) : std::logic_error(msg) { }
 };
 
 } // namespace geo_ip_loader

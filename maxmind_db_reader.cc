@@ -40,7 +40,7 @@ MMDB_lookup_result_s MaxmindDBReader::lookup_raw(const std::string &ip_address) 
 		throw std::system_error(code, msg);
 	}
 	if (!result.found_entry) {
-		throw NotFoundException();
+		throw NotFoundException("Not found");
 	}
 
 	return result;
