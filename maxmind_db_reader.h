@@ -3,6 +3,7 @@
 
 #include <maxminddb.h>
 #include <string>
+#include <stdexcept>
 
 #include "constants.h"
 
