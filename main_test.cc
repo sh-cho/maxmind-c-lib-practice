@@ -36,14 +36,24 @@ TEST_F(GeoIPLoaderFixture, NormalMccmnc) {
 
 	// 2. Not exists in ISP DB - Lookup Country DB
 	// 2-1. Exists in Country DB
+	// 2-1-1. Have "country.iso_code" path
 	EXPECT_EQ(maxmindGeoIpLoader->getMccmnc("2001:0220:0000:0000:0000:2000:0000:0000"),
 			  std::to_string(COUNTRY_MCC_MAP.at("KR")));
 	EXPECT_EQ(maxmindGeoIpLoader->getMccmnc("217.65.48.0"),
 			  std::to_string(COUNTRY_MCC_MAP.at("GI")));
-	// 2-1-1. Not Exists
+	// 2-1-2. Doesn't have iso_code
+	EXPECT_EQ(maxmindGeoIpLoader->getMccmnc("::212.47.235.81"),
+			  DEFAULT_MCCMNC);
 	// 2-2. Not Exists in Country DB
 	EXPECT_EQ(maxmindGeoIpLoader->getMccmnc("0.0.0.0"), DEFAULT_MCC);
 	EXPECT_EQ(maxmindGeoIpLoader->getMccmnc("::1"), DEFAULT_MCC);
+}
+
+TEST_F(GeoIPLoaderFixture, Ipv6Format) {
+	EXPECT_EQ(maxmindGeoIpLoader->getMccmnc("::217.65.48.0"),
+			  std::to_string(COUNTRY_MCC_MAP.at("GI")));
+	EXPECT_EQ(maxmindGeoIpLoader->getMccmnc("::d941:3000"),
+			  std::to_string(COUNTRY_MCC_MAP.at("GI")));
 }
 
 TEST_F(GeoIPLoaderFixture, WrongFormat) {
